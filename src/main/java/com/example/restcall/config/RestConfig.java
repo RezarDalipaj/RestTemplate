@@ -1,6 +1,5 @@
 package com.example.restcall.config;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +7,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
@@ -36,11 +34,7 @@ public class RestConfig {
         return new RestTemplate();
     }
     @Bean
-    public JsonFactory getJson(){
-        return new JsonFactory();
-    }
-    @Bean
     public ObjectMapper getMapper(){
-        return new ObjectMapper(getJson());
+        return new ObjectMapper();
     }
 }
