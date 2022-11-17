@@ -1,40 +1,105 @@
 package com.example.restcall.service.impl;
 
-import com.example.restcall.model.dto.AnimeError;
-import com.example.restcall.model.dto.AnimeResponse;
+import com.example.restcall.config.BaseProperties;
+import com.example.restcall.model.dto.*;
 import com.example.restcall.service.ConsumerService;
 import com.example.restcall.util.ReqBuilder;
-import com.example.restcall.util.RestUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class ConsumerServiceImpl implements ConsumerService {
     private final ObjectMapper objectMapper;
+    private final BaseProperties baseProperties;
     @Override
     public ResponseEntity<?> getAnime(Integer animeId, Integer episodeId) throws IOException {
-        String endpoint = "anime/" + animeId + "/episodes/" + episodeId;
+        String endpoint = baseProperties.getUrl() + "anime/" + animeId + "/episodes/" + episodeId;
         try {
-            RestUtil<Object, AnimeResponse> restServiceAnime = new ReqBuilder<Object, AnimeResponse>()
+            var response = new ReqBuilder()
                     .endpoint(endpoint)
                     .method(HttpMethod.GET)
-                    .responseClass(AnimeResponse.class)
-                    .build();
-            var response = restServiceAnime.restCall();
+                    .execute(AnimeResponse.class);
             return ResponseEntity.ok(response);
         }catch (HttpClientErrorException exception){
             byte [] message = exception.getResponseBodyAsByteArray();
             AnimeError error = objectMapper.readValue(message, AnimeError.class);
             return ResponseEntity.status(exception.getStatusCode()).body(error);
         }
+    }
+    private String getCustomerNo() {
+        String endpoint = "user/v3/custno?scn=992007407580526";
+        var response = new ReqBuilder()
+                .endpoint(endpoint)
+                .method(HttpMethod.GET)
+                .basicAuth(baseProperties.getKey(), baseProperties.getSecret())
+                .execute(CustomerNumberResponse.class);
+        return response.getCustNo();
+    }
+    @Override
+    public ResponseEntity<?> getToken() {
+        String endpoint = "oauth2/token";
+        var tokenRequest = new TokenRequest();
+        tokenRequest.setCustomer_number(getCustomerNo());
+        tokenRequest.setGrant_type("client_credentials");
+        tokenRequest.setScope("ANONYMOUS IDENTIFIED AUTHENTICATED");
+        var response = new ReqBuilder()
+                .endpoint(endpoint)
+                .method(HttpMethod.POST)
+                .requestBody(tokenRequest)
+                .mediaType(MediaType.APPLICATION_FORM_URLENCODED)
+                .basicAuth(baseProperties.getKey(), baseProperties.getSecret())
+                .execute(TokenResponse.class);
+        return ResponseEntity.ok(response);
+    }
+    @Override
+    public ResponseEntity<?> signup(SignUpRequest signUpRequest) throws Exception {
+        String endpoint = baseProperties.getInternship() + "signup";
+        try {
+            var response = new ReqBuilder()
+                    .endpoint(endpoint)
+                    .method(HttpMethod.POST)
+                    .mediaType(MediaType.APPLICATION_JSON)
+                    .requestBody(signUpRequest)
+                    .execute(SignUpResponse.class);
+            return ResponseEntity.ok(response);
+        }catch (HttpClientErrorException httpException){
+            byte [] message = httpException.getResponseBodyAsByteArray();
+            var error = objectMapper.readValue(message, HungerNetError.class);
+            return ResponseEntity.status(httpException.getStatusCode()).body(error);
+        }
+    }
+    private String getInternshipToken() {
+        String endpoint = baseProperties.getInternship() + "login";
+        var loginRequest = new LoginRequest("rezari", "lhind");
+        var response = new ReqBuilder()
+                .endpoint(endpoint)
+                .method(HttpMethod.POST)
+                .mediaType(MediaType.APPLICATION_JSON)
+                .requestBody(loginRequest)
+                .execute(LoginResponse.class);
+        return response.getToken();
+    }
+    @Override
+    public ResponseEntity<?> getUsers() {
+        String endpoint = baseProperties.getInternship() + "users";
+        var response = new ReqBuilder()
+                .endpoint(endpoint)
+                .method(HttpMethod.GET)
+                .bearerAuthentication(getInternshipToken())
+                .execute(List.class);
+        List<SignUpResponse> users = objectMapper.convertValue(response, new TypeReference<>() {});
+        return ResponseEntity.ok(users);
     }
 }

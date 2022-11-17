@@ -12,5 +12,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ErrorDto {
     @JsonProperty
-    private Object stackTrace;
+    private Object error;
 }

@@ -12,4 +12,6 @@ import org.springframework.stereotype.Component;
 public class BaseProperties {
     private String url;
     private String internship;
+    private String key;
+    private String secret;
 }
