@@ -1,4 +1,4 @@
-package com.example.restcall.model.dto;
+package com.example.restcall.model.dto.samba;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

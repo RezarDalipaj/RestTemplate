@@ -1,4 +1,4 @@
-package com.example.restcall.model.dto;
+package com.example.restcall.model.dto.hungerNet;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginResponse {
-    private String token;
+public class LoginRequest {
+    private String username;
+    private String password;
 }

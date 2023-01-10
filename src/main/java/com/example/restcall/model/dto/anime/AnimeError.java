@@ -1,4 +1,4 @@
-package com.example.restcall.model.dto;
+package com.example.restcall.model.dto.anime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

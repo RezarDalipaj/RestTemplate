@@ -1,4 +1,4 @@
-package com.example.restcall.model.dto;
+package com.example.restcall.model.dto.samba;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginRequest {
-    private String username;
-    private String password;
+public class CustomerNumberResponse {
+    private String custNo;
+    private String ucid;
 }

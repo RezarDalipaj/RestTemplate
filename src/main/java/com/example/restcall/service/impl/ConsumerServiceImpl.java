@@ -1,9 +1,18 @@
 package com.example.restcall.service.impl;
 
 import com.example.restcall.config.BaseProperties;
-import com.example.restcall.model.dto.*;
+import com.example.restcall.model.dto.anime.AnimeError;
+import com.example.restcall.model.dto.anime.AnimeResponse;
+import com.example.restcall.model.dto.hungerNet.HungerNetError;
+import com.example.restcall.model.dto.hungerNet.LoginRequest;
+import com.example.restcall.model.dto.hungerNet.LoginResponse;
+import com.example.restcall.model.dto.hungerNet.SignUpRequest;
+import com.example.restcall.model.dto.hungerNet.SignUpResponse;
+import com.example.restcall.model.dto.samba.CustomerNumberResponse;
+import com.example.restcall.model.dto.samba.TokenRequest;
+import com.example.restcall.model.dto.samba.TokenResponse;
 import com.example.restcall.service.ConsumerService;
-import com.example.restcall.util.ReqBuilder;
+import com.example.restcall.service.client.RestClient;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -27,7 +36,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     public ResponseEntity<?> getAnime(Integer animeId, Integer episodeId) throws IOException {
         String endpoint = baseProperties.getUrl() + "anime/" + animeId + "/episodes/" + episodeId;
         try {
-            var response = ReqBuilder.createRequest()
+            var response = RestClient.createRequest()
                     .endpoint(endpoint)
                     .method(HttpMethod.GET)
                     .execute(AnimeResponse.class);
@@ -40,7 +49,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     }
     private String getCustomerNo() {
         String endpoint = "user/v3/custno?scn=992007407580526";
-        var response = ReqBuilder.createRequest()
+        var response = RestClient.createRequest()
                 .endpoint(endpoint)
                 .method(HttpMethod.GET)
                 .basicAuth(baseProperties.getKey(), baseProperties.getSecret())
@@ -55,7 +64,7 @@ public class ConsumerServiceImpl implements ConsumerService {
             .grant_type("client_credentials")
             .scope("ANONYMOUS IDENTIFIED AUTHENTICATED")
             .build();
-        var response = ReqBuilder.createRequest()
+        var response = RestClient.createRequest()
                 .endpoint(endpoint)
                 .method(HttpMethod.POST)
                 .requestBody(tokenRequest)
@@ -65,10 +74,10 @@ public class ConsumerServiceImpl implements ConsumerService {
         return ResponseEntity.ok(response);
     }
     @Override
-    public ResponseEntity<?> signup(SignUpRequest signUpRequest) throws Exception {
+    public ResponseEntity<?> signup(SignUpRequest signUpRequest) throws IOException {
         String endpoint = baseProperties.getInternship() + "signup";
         try {
-            var response = ReqBuilder.createRequest()
+            var response = RestClient.createRequest()
                     .endpoint(endpoint)
                     .method(HttpMethod.POST)
                     .mediaType(MediaType.APPLICATION_JSON)
@@ -84,7 +93,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     private String getInternshipToken() {
         String endpoint = baseProperties.getInternship() + "login";
         var loginRequest = new LoginRequest("rezari", "lhind");
-        var response = ReqBuilder.createRequest()
+        var response = RestClient.createRequest()
                 .endpoint(endpoint)
                 .method(HttpMethod.POST)
                 .mediaType(MediaType.APPLICATION_JSON)
@@ -95,7 +104,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     @Override
     public ResponseEntity<?> getUsers() {
         String endpoint = baseProperties.getInternship() + "users";
-        var response = ReqBuilder.createRequest()
+        var response = RestClient.createRequest()
                 .endpoint(endpoint)
                 .method(HttpMethod.GET)
                 .bearerAuthentication(getInternshipToken())

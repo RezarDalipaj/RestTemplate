@@ -1,4 +1,4 @@
-package com.example.restcall.util;
+package com.example.restcall.service.client;
 
 import com.example.restcall.config.RestConfig;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -20,7 +20,7 @@ import java.util.Map;
 
 @Setter
 @Getter
-public class ReqBuilder {
+public class RestClient {
     private String endpoint;
     private HttpMethod method;
     private Object requestBody;
@@ -32,35 +32,35 @@ public class ReqBuilder {
     private final RestTemplate restTemplate = context.getBean(RestTemplate.class);
     private final ObjectMapper mapper = context.getBean(ObjectMapper.class);
 
-    public static ReqBuilder createRequest(){
-        return new ReqBuilder();
+    public static RestClient createRequest(){
+        return new RestClient();
     }
 
-    public ReqBuilder endpoint(String endpoint) {
+    public RestClient endpoint(String endpoint) {
         setEndpoint(endpoint);
         return this;
     }
 
-    public ReqBuilder method(HttpMethod method) {
+    public RestClient method(HttpMethod method) {
         setMethod(method);
         return this;
     }
 
-    public ReqBuilder requestBody(Object requestBody) {
+    public RestClient requestBody(Object requestBody) {
         setRequestBody(requestBody);
         return this;
     }
 
-    public ReqBuilder mediaType(MediaType mediaType) {
+    public RestClient mediaType(MediaType mediaType) {
         setMediaType(mediaType);
         return this;
     }
 
-    public ReqBuilder bearerAuthentication(String token) {
+    public RestClient bearerAuthentication(String token) {
         setToken(token);
         return this;
     }
-    public ReqBuilder basicAuth(String username, String password){
+    public RestClient basicAuth(String username, String password){
         setUsername(username);
         setPassword(password);
         return this;
@@ -71,13 +71,13 @@ public class ReqBuilder {
         headers.setAccept(Collections.singletonList(MediaType.ALL));
         if (getUsername()!=null)
             headers.setBasicAuth(username, password);
-        else if (token!=null)
+        else if (getToken()!=null)
             headers.setBearerAuth(token);
         return headers;
     }
     public <R> R execute(Class<R> responseClass){
         HttpEntity<?> requestEntity;
-        if (getMediaType() != null && getMediaType().equals(MediaType.APPLICATION_FORM_URLENCODED)){
+        if (getMediaType() != null && MediaType.APPLICATION_FORM_URLENCODED.equals(getMediaType())){
             MultiValueMap<String, Object> finalBody = new LinkedMultiValueMap<>();
             Map<String, Object> body = mapper.convertValue(getRequestBody(), new TypeReference<>() {});
             finalBody.setAll(body);

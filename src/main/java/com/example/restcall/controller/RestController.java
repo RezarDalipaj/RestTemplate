@@ -1,17 +1,17 @@
 package com.example.restcall.controller;
 
-import com.example.restcall.model.dto.SignUpRequest;
+import com.example.restcall.model.dto.hungerNet.SignUpRequest;
 import com.example.restcall.service.ConsumerService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
-@RestController
+@org.springframework.web.bind.annotation.RestController
 @RequestMapping()
-@AllArgsConstructor
-public class ProcessorController {
+@RequiredArgsConstructor
+public class RestController {
     private final ConsumerService restConsumerService;
     @GetMapping("/anime/{animeId}/episode/{episodeId}")
     public ResponseEntity<?> getAnime(@PathVariable(name = "animeId") Integer animeId
@@ -27,7 +27,7 @@ public class ProcessorController {
         return restConsumerService.signup(signUpRequest);
     }
     @GetMapping("/users")
-    public ResponseEntity<?> getUsers() throws Exception {
+    public ResponseEntity<?> getUsers() {
         return restConsumerService.getUsers();
     }
 }
