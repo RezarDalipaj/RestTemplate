@@ -27,7 +27,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     public ResponseEntity<?> getAnime(Integer animeId, Integer episodeId) throws IOException {
         String endpoint = baseProperties.getUrl() + "anime/" + animeId + "/episodes/" + episodeId;
         try {
-            var response = new ReqBuilder()
+            var response = ReqBuilder.createRequest()
                     .endpoint(endpoint)
                     .method(HttpMethod.GET)
                     .execute(AnimeResponse.class);
@@ -40,7 +40,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     }
     private String getCustomerNo() {
         String endpoint = "user/v3/custno?scn=992007407580526";
-        var response = new ReqBuilder()
+        var response = ReqBuilder.createRequest()
                 .endpoint(endpoint)
                 .method(HttpMethod.GET)
                 .basicAuth(baseProperties.getKey(), baseProperties.getSecret())
@@ -50,11 +50,12 @@ public class ConsumerServiceImpl implements ConsumerService {
     @Override
     public ResponseEntity<?> getToken() {
         String endpoint = "oauth2/token";
-        var tokenRequest = new TokenRequest();
-        tokenRequest.setCustomer_number(getCustomerNo());
-        tokenRequest.setGrant_type("client_credentials");
-        tokenRequest.setScope("ANONYMOUS IDENTIFIED AUTHENTICATED");
-        var response = new ReqBuilder()
+        var tokenRequest = TokenRequest.builder()
+            .customer_number(getCustomerNo())
+            .grant_type("client_credentials")
+            .scope("ANONYMOUS IDENTIFIED AUTHENTICATED")
+            .build();
+        var response = ReqBuilder.createRequest()
                 .endpoint(endpoint)
                 .method(HttpMethod.POST)
                 .requestBody(tokenRequest)
@@ -67,7 +68,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     public ResponseEntity<?> signup(SignUpRequest signUpRequest) throws Exception {
         String endpoint = baseProperties.getInternship() + "signup";
         try {
-            var response = new ReqBuilder()
+            var response = ReqBuilder.createRequest()
                     .endpoint(endpoint)
                     .method(HttpMethod.POST)
                     .mediaType(MediaType.APPLICATION_JSON)
@@ -83,7 +84,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     private String getInternshipToken() {
         String endpoint = baseProperties.getInternship() + "login";
         var loginRequest = new LoginRequest("rezari", "lhind");
-        var response = new ReqBuilder()
+        var response = ReqBuilder.createRequest()
                 .endpoint(endpoint)
                 .method(HttpMethod.POST)
                 .mediaType(MediaType.APPLICATION_JSON)
@@ -94,7 +95,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     @Override
     public ResponseEntity<?> getUsers() {
         String endpoint = baseProperties.getInternship() + "users";
-        var response = new ReqBuilder()
+        var response = ReqBuilder.createRequest()
                 .endpoint(endpoint)
                 .method(HttpMethod.GET)
                 .bearerAuthentication(getInternshipToken())

@@ -11,7 +11,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping()
 @AllArgsConstructor
-public class AnimeController {
+public class ProcessorController {
     private final ConsumerService restConsumerService;
     @GetMapping("/anime/{animeId}/episode/{episodeId}")
     public ResponseEntity<?> getAnime(@PathVariable(name = "animeId") Integer animeId

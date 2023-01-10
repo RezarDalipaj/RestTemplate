@@ -11,7 +11,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -19,7 +18,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Collections;
 import java.util.Map;
 
-@Component
 @Setter
 @Getter
 public class ReqBuilder {
@@ -33,6 +31,10 @@ public class ReqBuilder {
     ApplicationContext context = new AnnotationConfigApplicationContext(RestConfig.class);
     private final RestTemplate restTemplate = context.getBean(RestTemplate.class);
     private final ObjectMapper mapper = context.getBean(ObjectMapper.class);
+
+    public static ReqBuilder createRequest(){
+        return new ReqBuilder();
+    }
 
     public ReqBuilder endpoint(String endpoint) {
         setEndpoint(endpoint);
@@ -63,7 +65,7 @@ public class ReqBuilder {
         setPassword(password);
         return this;
     }
-    private HttpHeaders setHeaders(MediaType mediaType, String token){
+    private HttpHeaders setHeaders(MediaType mediaType){
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(mediaType);
         headers.setAccept(Collections.singletonList(MediaType.ALL));
@@ -79,10 +81,10 @@ public class ReqBuilder {
             MultiValueMap<String, Object> finalBody = new LinkedMultiValueMap<>();
             Map<String, Object> body = mapper.convertValue(getRequestBody(), new TypeReference<>() {});
             finalBody.setAll(body);
-            requestEntity = new HttpEntity<>(finalBody, setHeaders(getMediaType(), getToken()));
+            requestEntity = new HttpEntity<>(finalBody, setHeaders(getMediaType()));
         }
         else
-            requestEntity = new HttpEntity<>(getRequestBody(), setHeaders(getMediaType(), getToken()));
+            requestEntity = new HttpEntity<>(getRequestBody(), setHeaders(getMediaType()));
         return restTemplate.exchange(getEndpoint(), getMethod(), requestEntity, responseClass).getBody();
     }
 }
